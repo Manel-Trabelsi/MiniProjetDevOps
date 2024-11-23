@@ -1,11 +1,12 @@
-# Utiliser une image de base Python
-FROM python:3.8-slim
+# Utiliser une image de base PHP avec Apache
+FROM php:7.4-apache
 
-# Définir le répertoire de travail dans le conteneur
-WORKDIR /app
+# Copier le code de l'application dans le répertoire de travail du conteneur
+COPY src/ /var/www/html/
 
-# Copier le script dans le conteneur
-COPY calculate_product.py .
+# Modifier la configuration d'Apache pour écouter sur le port 81
+RUN sed -i 's/Listen 80/Listen 81/' /etc/apache2/ports.conf
+RUN sed -i 's/:80/:81/' /etc/apache2/sites-available/000-default.conf
 
-# Commande pour lancer le script
-CMD ["python", "calculate_product.py"]
+# Exposer le port 81
+EXPOSE 81

@@ -15,52 +15,27 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Étape 2 : Installer Java pour SonarScanner (nécessaire pour l'analyse)
-      - name: Set up JDK 11
-        uses: actions/setup-java@v3
-        with:
-          java-version: '11'
-          distribution: 'temurin'  # Utilisation de temurin au lieu de adoptopenjdk
-
-      # Étape 3 : Installer SonarScanner
-      - name: Install SonarScanner
-        run: |
-          wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip
-          unzip sonar-scanner-cli-4.8.0.2856-linux.zip
-          sudo mv sonar-scanner-4.8.0.2856-linux /opt/sonar-scanner
-          echo "export PATH=\$PATH:/opt/sonar-scanner/bin" >> $GITHUB_ENV
-
-      # Étape 4 : Exécuter l'analyse SonarQube
-      - name: Run SonarQube analysis
-        run: |
-          sonar-scanner \
-            -Dsonar.projectKey=MiniProjetDevOps \
-            -Dsonar.organization=your-organization-key \
-            -Dsonar.host.url=http://localhost:9000 \
-            -Dsonar.login=$SONAR_TOKEN \
-            -Dsonar.dashboardUrl=http://localhost:9080/dashboard?id=MiniProjetDevOps&codeScope=overall
-
-      # Étape 5 : Connexion à Docker Hub
+      # Étape 2 : Connexion à Docker Hub
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # Étape 6 : Construire l'image Docker
+      # Étape 3 : Construire l'image Docker
       - name: Build Docker image
         run: |
-          docker buildx build --platform linux/amd64 -t trabelsihammamimanel/calculate-product:latest .
+          docker build -t trabelsihammamimanel/php-web-app:latest .
 
-      # Étape 7 : Pousser l'image Docker
+      # Étape 4 : Pousser l'image Docker
       - name: Push Docker image
         run: |
-          docker push trabelsihammamimanel/calculate-product:latest
+  docker push trabelsihammamimanel/php-web-app:latest
 
-      # Étape 8 : Connexion à Azure
+      # Étape 5 : Connexion à Azure et déploiement
       - name: Log in to Azure and Deploy
         uses: azure/webapps-deploy@v2
         with:
           app-name: MohsenManelWebApp
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: .
+          images: trabelsihammamimanel/php-web-app:latest
