@@ -1,7 +1,9 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\.github",
+    "\\.github\\workflows"
   ],
-  "SelectedNode": "\\Dockerfile",
+  "SelectedNode": "\\.github\\workflows\\main_mohsenmanelwebapp.yml",
   "PreviewInSolutionExplorer": false
 }
