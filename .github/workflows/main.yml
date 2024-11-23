@@ -1,3 +1,51 @@
+D'accord, il semble que la ressource que vous essayez de déployer ou de consulter dans Azure ne soit pas trouvée. Cela peut être dû à plusieurs raisons, y compris une mauvaise configuration ou un problème avec le déploiement de l'application. Voyons comment diagnostiquer et corriger ce problème.
+
+Étape 1: Vérification de la Configuration Azure
+Accédez au portail Azure:
+
+Connectez-vous à portal.azure.com.
+Vérifiez votre App Service:
+
+Dans le menu de gauche, sélectionnez App Services.
+Recherchez et sélectionnez votre App Service mohsenmanelwebapp.
+Vérifiez les Propriétés de l'App Service:
+
+Assurez-vous que l'App Service est dans le bon groupe de ressources (mohsenmanelwebapp_group).
+Assurez-vous que l'App Service est en cours d'exécution.
+Étape 2: Vérification des Logs de Déploiement
+Accédez à la section Deployment Center:
+
+Dans le menu de gauche de votre App Service, sélectionnez Deployment Center.
+Vérifiez les logs de déploiement pour voir si des erreurs sont survenues lors du déploiement.
+Accédez à la section Log Stream:
+
+Dans le menu de gauche, sélectionnez Log stream.
+Cela vous permettra de voir les logs en temps réel et de vérifier s'il y a des erreurs lors du démarrage du conteneur Docker.
+Étape 3: Vérification du Dockerfile et du Code
+Assurez-vous que votre Dockerfile est configuré correctement pour servir votre application PHP. Voici un rappel du Dockerfile :
+
+Dockerfile
+Copy Code
+# Utiliser une image de base PHP avec Apache
+FROM php:7.4-apache
+
+# Copier le code de l'application dans le répertoire de travail du conteneur
+COPY src/ /var/www/html/
+
+# Modifier la configuration d'Apache pour écouter sur le port 81
+RUN sed -i 's/Listen 80/Listen 81/' /etc/apache2/ports.conf
+RUN sed -i 's/:80/:81/' /etc/apache2/sites-available/000-default.conf
+
+# Exposer le port 81
+EXPOSE 81
+Étape 4: Vérification des Secrets GitHub
+Assurez-vous que tous les secrets (DOCKER_USERNAME, DOCKER_PASSWORD, AZURE_WEBAPP_PUBLISH_PROFILE, SONAR_TOKEN) sont correctement configurés dans les paramètres de votre dépôt GitHub.
+
+Étape 5: Exemple de Workflow GitHub Actions
+Voici un exemple de fichier .github/workflows/main.yml complet et mis à jour pour inclure toutes les étapes, y compris l'analyse SonarQube, la construction de l'image Docker, et le déploiement sur Azure :
+
+yaml
+Copy Code
 name: Build, Analyze and Push Docker Image
 
 on:
@@ -64,3 +112,11 @@ jobs:
           app-name: MohsenManelWebApp
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
           images: trabelsihammamimanel/php-web-app:latest
+Étape 6: Pousser les Modifications
+Après avoir corrigé les problèmes, poussez les modifications :
+
+bash
+Copy Code
+git add .
+git commit -m "Fix issues in CI/CD pipeline"
+git push origin main
